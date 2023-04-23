@@ -1,60 +1,39 @@
-interface Scoreable {
-    readonly totalscore: number;
-    render(): void;
-}
-
-interface Foodable {
-    element: HTMLDivElement;
-    clickEventHnadler(): void;
-}
-
-interface Foodsable {
-    elements: NodeListOf<HTMLDivElement>;
-    readonly activeElements: HTMLDivElement[];
-    readonly activeElementsScore: number[];
-}
-
-
-class Score implements Scoreable {
-    private static instance: Score;
+"use strict";
+class Score {
     get totalscore() {
         const foods = Foods.getInstance();
         return foods.activeElementsScore.reduce((total, score) => total + score, 0);
     }
     render() {
-        document.querySelector(".score__number")!.textContent = String(this.totalscore);
+        document.querySelector(".score__number").textContent = String(this.totalscore);
     }
-    private constructor() { }
+    constructor() { }
     static getInstance() {
         if (!Score.instance) {
             Score.instance = new Score();
         }
         return Score.instance;
     }
-
 }
-class Food implements Foodable {
-    constructor(public element: HTMLDivElement) {
+class Food {
+    constructor(element) {
+        this.element = element;
         element.addEventListener("click", this.clickEventHnadler.bind(this));
     }
     clickEventHnadler() {
         this.element.classList.toggle("food--active");
         const score = Score.getInstance();
-        score.render()
+        score.render();
     }
 }
-class Foods implements Foodsable {
-    private static instance: Foods;
-    elements = document.querySelectorAll<HTMLDivElement>(".food");
-    private _activeElements: HTMLDivElement[] = [];
-    private _activeElementsScore: number[] = [];
+class Foods {
     get activeElements() {
         this._activeElements = [];
         this.elements.forEach(element => {
             if (element.classList.contains("food--active")) {
                 this._activeElements.push(element);
             }
-        })
+        });
         return this._activeElements;
     }
     get activeElementsScore() {
@@ -62,15 +41,18 @@ class Foods implements Foodsable {
         this.activeElements.forEach(element => {
             const foodScore = element.querySelector(".food__score");
             if (foodScore) {
-                this._activeElementsScore.push(Number(foodScore.textContent))
+                this._activeElementsScore.push(Number(foodScore.textContent));
             }
-        })
+        });
         return this._activeElementsScore;
     }
-    private constructor() {
+    constructor() {
+        this.elements = document.querySelectorAll(".food");
+        this._activeElements = [];
+        this._activeElementsScore = [];
         this.elements.forEach(element => {
             new Food(element);
-        })
+        });
     }
     static getInstance() {
         if (!Foods.instance) {
