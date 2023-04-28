@@ -1,3 +1,5 @@
-import { Foods } from "./foods.js";
+// @ts-ignore
+
+import { Foods } from "./foods";
 
 Foods.getInstance();
